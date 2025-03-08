@@ -1,0 +1,549 @@
+/* ------------------- NAVBAR ------------------- */
+
+nav{
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+   margin-right: 5%; 
+}
+
+/* --------------------- END ----------------- */
+#space{
+    margin-left: 10%;
+    padding-top: 20px;
+}
+#height{
+    height: 100px;
+}
+/* #grid{
+    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-gap: 20px;
+} */
+
+/* -------------- END ------------- */
+
+/* CONTACT PAGE FIRST IMAGE CSS */
+#hove{
+    transition: all 1s 0s;
+    border-radius: 15px;
+    width: 70%;
+    margin-left: 20px;
+}
+#hove:hover{
+    scale: 1.2;
+}
+#trans{
+    margin: auto;
+    overflow: hidden;
+    margin-top: 100px;
+}
+
+/* CONTACT BUTTON */
+#height1{
+    height: 140px;
+}
+#space1{
+    text-align: center;
+    color: white;
+}
+/* Contact */ 
+.button {
+  width: 160px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  border-radius: 30px;
+  color: rgb(19, 19, 19);
+  font-weight: 600;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition-duration: .2s;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.116);
+  padding-left: 8px;
+  transition-duration: .5s;
+  justify-content: center;
+  margin-left: 45%;
+}
+
+.svgIcon {
+  height: 25px;
+  transition-duration: 1.5s;
+}
+
+.bell path {
+  fill: rgb(19, 19, 19);
+}
+
+.button:hover {
+  background-color: dodgerblue;
+  transition-duration: .5s;
+}
+
+.button:active {
+  transform: scale(0.97);
+  transition-duration: .2s;
+}
+
+.button:hover .svgIcon {
+  transform: rotate(250deg);
+  transition-duration: 1.5s;
+}
+
+
+/* GUIDE STAFF PAGE BUTTONS */
+.button3 {
+  width: 180px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  border-radius: 30px;
+  color: rgb(19, 19, 19);
+  font-weight: 600;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition-duration: .2s;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.116);
+  padding-left: 8px;
+  transition-duration: .5s;
+  justify-content: center;
+  margin-left: 16%;
+  border: 2px solid dodgerblue;
+}
+
+.svgIcon {
+  height: 25px;
+  transition-duration: 1.5s;
+}
+
+.bell path {
+  fill: rgb(19, 19, 19);
+}
+
+.button3:hover {
+  background-color: dodgerblue;
+  transition-duration: .5s;
+}
+
+.button3:active {
+  transform: scale(0.97);
+  transition-duration: .2s;
+}
+
+.button3:hover .svgIcon {
+  transform: rotate(250deg);
+  transition-duration: 1.5s;
+}
+
+
+
+/* -------------- END ------------- */
+
+/* FORM CSS */
+
+/* .container{
+    margin-left: 0px;
+} */
+#name{
+    margin-left: 30px;
+    width: 50%;
+}
+#email{
+    border: none;
+    width: 60%;
+    margin-left: 30px;
+}
+#number{
+    margin-left: 30px;
+    width: 60%;
+    border: none;
+}
+#message{
+    margin-left: 30px;
+    width: 60%;
+    border: none; 
+}
+.form-label{
+    text-align: left;
+}
+.text-danger{
+    margin-left: 30px;
+}
+#mag{
+    margin-left: 0px;
+}
+#name{
+    border: none;
+    width: 60%;
+}
+#name1{
+    border: none;
+    width: 45%;
+    padding: 8px;
+}
+#button1{
+    margin-left: 30px;
+    width: 60%;
+    text-align: center;
+    background-color: #ecedec;
+    border-radius: 15px;
+    border: none;
+}
+#captchaInput{
+    margin-left: 30px;
+    width: 60%;
+    border: none;
+}
+#captchaText{
+    margin-left: 30px;
+    width: 60%;
+    border: none;
+}
+#b{
+    margin-left: 0px;
+}
+/* LINKS FB, YOU, TWITTER, INSTA */
+
+#d,#e,#f,#g{
+    width: 48px;
+    height: 48px;
+    border-radius: 23px;
+    /* background-color: black; */
+    margin-left: 10px;
+}
+#i{
+    margin-top: 18px;
+    /* margin-left: 0px; */
+}
+#h{
+    margin-top: 9px;
+    justify-content: end;
+    margin-right: 10%;
+}
+#j{
+    margin-left: 80px;
+}
+#c{
+    margin-left: 30%;
+}
+
+
+/* -------------- END ------------- */
+
+/* GUIDE STAFF PAGE CSS */
+
+
+#K{
+    display: flex;
+    margin-left: 25%;
+    align-items: center;
+    width: 50%;
+    border-radius: 15px;
+    background-color:  dodgerblue;
+}
+#K:hover{
+    background-color: #0276b3;
+    color: black;
+    box-shadow: inset;
+    border: none;
+}
+
+/* -------------- END ------------- */
+
+/* DENNIS PAGE CSS */
+
+.card-title{
+  color: dodgerblue;
+}
+.card-img-top{
+  border-radius: 15px;
+}
+.card{
+  transition: 0.3s ease;
+  width: 300px;
+  margin-left: 10%;
+}
+.card:hover{
+  transform: scale(1.03);
+    box-shadow: 0px 10px 10px rgb(103, 103, 105)
+}
+
+.imghover{
+  transition: 0.3s ease;
+}
+.imghover:hover{
+  transform: scale(1.03);
+    box-shadow: 0px 10px 10px rgb(103, 103, 105)
+}
+
+.imghover1{
+  transition: 0.3s ease;
+}
+.imghover1:hover{
+  transform: scale(1.03);
+}
+
+
+
+/* -------------- END ------------- */
+
+/* LOGIN FORM */ 
+#height2{
+    align-items: center;
+    height: 100px;
+}
+#space2{
+    margin-left: 10%;
+    align-items: center;
+    padding-top: 1%;
+}
+.Login{
+    margin-top: 8%;
+}
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: auto;
+    background: linear-gradient(45deg, skyblue, darkblue);
+    padding: 30px;
+    width: 450px;
+    border-radius: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    transition: background 0.3s ease;
+  }
+  
+  .form:hover {
+    background: linear-gradient(45deg, darkblue, skyblue);
+  }
+  
+  ::placeholder {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  }
+  
+  .form button {
+    align-self: flex-end;
+  }
+  
+  .flex-column > label {
+    color: white;
+    font-weight: 600;
+  }
+  
+  .inputForm {
+    border: 1.5px solid #ecedec;
+    border-radius: 10em;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    transition: 0.2s ease-in-out;
+    background-color: white;
+  }
+  
+  .input {
+    margin-left: 10px;
+    border-radius: 10rem;
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .input:focus {
+    outline: none;
+  }
+  
+  .inputForm:focus-within {
+    border: 1.5px solid orange;
+  }
+  
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  
+  .flex-row > div > label {
+    font-size: 14px;
+    color: black;
+    font-weight: 400;
+  }
+  
+  .span {
+    font-size: 14px;
+    margin-left: 5px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .button-submit {
+    position: relative;
+    display: inline-block;
+    padding: 15px 30px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-decoration: none;
+    background: transparent;
+    transition: ease-out 0.5s;
+    border: 2px solid;
+    border-radius: 10em;
+    box-shadow: inset 0 0 0 0 blue;
+    margin: 20px 0 10px 0;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    height: 50px;
+    width: 100%;
+    cursor: pointer;
+  }
+  
+  .button-submit:hover {
+    color: white;
+    box-shadow: inset 0 -100px 0 0 royalblue;
+  }
+  
+  .button-submit:active {
+    transform: scale(0.9);
+  }
+  
+  .p {
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    margin: 5px 0;
+  }
+  
+  .btn {
+    margin-top: 10px;
+    width: 100%;
+    height: 50px;
+    border-radius: 10em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    gap: 10px;
+    border: 1px solid #ededef;
+    background-color: white;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+  }
+  
+  .btn:hover {
+    border: 1px solid orange;
+  }
+
+
+/* SOCIAL LINKS*/
+ul {
+    list-style: none;
+  }
+  
+  .example-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .example-2 .icon-content {
+    margin: 0 10px;
+    position: relative;
+  }
+  .example-2 .icon-content .tooltip {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 5px;
+    opacity: 0;
+    visibility: hidden;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  .example-2 .icon-content:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    top: -50px;
+  }
+  .example-2 .icon-content a {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: #4d4d4d;
+    background-color: #fff;
+    transition: all 0.3s ease-in-out;
+  }
+  .example-2 .icon-content a:hover {
+    box-shadow: 3px 2px 45px 0px rgb(0 0 0 / 12%);
+  }
+  .example-2 .icon-content a svg {
+    position: relative;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+  }
+  .example-2 .icon-content a:hover {
+    color: white;
+  }
+  .example-2 .icon-content a .filled {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background-color: #000;
+    transition: all 0.3s ease-in-out;
+  }
+  .example-2 .icon-content a:hover .filled {
+    height: 100%;
+  }
+  
+  .example-2 .icon-content a[data-social="linkedin"] .filled,
+  .example-2 .icon-content a[data-social="linkedin"] ~ .tooltip {
+    background-color: #0274b3;
+  }
+  
+  .example-2 .icon-content a[data-social="github"] .filled,
+  .example-2 .icon-content a[data-social="github"] ~ .tooltip {
+    background-color: #24262a;
+  }
+  .example-2 .icon-content a[data-social="instagram"] .filled,
+  .example-2 .icon-content a[data-social="instagram"] ~ .tooltip {
+    background: linear-gradient(
+      45deg,
+      #405de6,
+      #5b51db,
+      #b33ab4,
+      #c135b4,
+      #e1306c,
+      #fd1f1f
+    );
+  }
+  .example-2 .icon-content a[data-social="youtube"] .filled,
+  .example-2 .icon-content a[data-social="youtube"] ~ .tooltip {
+    background-color: #ff0000;
+  }
+  
+  
+  
+
+/*  */

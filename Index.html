@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOME</title>
+        <!-- Bootstrap and Js cdn -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="/jquery & css/home.css">
+</head>
+<body>
+
+    <script>
+        window.isAuthenticated = 1;
+        window.useExternalGtmCode = 0;
+        window.clientUserId = 2591959;
+        window.clientUserName = '8c1edaa5-22cc-4a3e-b06e-923d17082c0d';
+        window.userCountryCode = 'pk';
+        window.logPageEvent = 1;
+        window.userHasAdsParams = 1;
+        window.utmSourceFromReferrer = 0;
+        window.currentLang = '';
+        window.baseUrl = 'website-templates';
+        window.currentUrl = 'website-templates';
+        window.np_userId = '';
+        window.isAmplitudeInitialized = false;
+        window.sha256Email = '3e1af8d823ebd659f9545cd3e8e79f08aecc410d6f0a2e6e423244efc878819a';
+    
+        function getCookieOrLocalStorage(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) {
+                    return c.substring(nameEQ.length, c.length);
+                }
+            }
+            var lsValue = localStorage.getItem(name);
+            return !!lsValue;
+        }
+    
+        function sendAnalyticsData(eventType, props, cb) {
+            var json = { data: {} };
+            json.userToken = np_userId;
+            json.data.adsParams = $.cookie('AdsParameters');
+            json.data.ga = $.cookie('_ga');
+            json.data.gac = $.cookie('_gac_UA-88868916-2');
+            json.data.userAgent = navigator.userAgent;
+            json.data.eventType = eventType;
+            json.data.props = props;
+            $.ajax({
+                'type': 'POST',
+                'url': '/Feedback/SendAdsLog',
+                'contentType': 'application/json; charset=utf-8',
+                'data': JSON.stringify(json),
+                'dataType': 'json',
+                'complete': cb || function() {}
+            });
+        }
+    
+        function initializeAmplitudeUser() {
+            if (isAmplitudeInitialized) {
+                return;
+            }
+            isAmplitudeInitialized = true;
+    
+            if (clientUserId > 0)
+            {
+                identifyAmplitudeUser(clientUserId, clientUserName);
+            }
+            else
+            {
+                identifyAmplitudeUser(null);
+            }
+        }
+    
+        function sendAmplitudeAnalyticsData(eventName, eventProperties, userProperties, callback_function) {
+            initializeAmplitudeUser();
+    
+            if (userProperties) {
+                if(userProperties.utm_source || userProperties.utm_campaign) {
+                    var identify = new amplitude.Identify();
+                    identify.setOnce("utm_campaign", userProperties.utm_campaign);
+                    identify.setOnce("utm_source", userProperties.utm_source);
+                    identify.setOnce("utm_content", userProperties.utm_content);
+                    identify.setOnce("utm_group", userProperties.utm_group);
+                    identify.setOnce("utm_term", userProperties.utm_term);
+                    identify.setOnce("utm_page", userProperties.utm_page);
+                    identify.setOnce("utm_page2", userProperties.utm_page);
+                    identify.setOnce("referrer", userProperties.referrer);
+    
+                    amplitude.getInstance().identify(identify);
+    
+                    userProperties.utm_source_last = userProperties.utm_source;
+                    userProperties.utm_campaign_last = userProperties.utm_campaign;
+                    userProperties.utm_content_last = userProperties.utm_content;
+                    userProperties.utm_group_last = userProperties.utm_group;
+                    userProperties.utm_term_last = userProperties.utm_term;
+                    userProperties.utm_page_last = userProperties.utm_page;
+                }
+    
+                var userProps = objectWithoutProperties(userProperties, ["utm_campaign", "utm_source","utm_content", "utm_term", "utm_page", "utm_group", "referrer"]);
+                amplitude.getInstance().setUserProperties(userProps);
+            }
+    
+            if (!eventProperties) {
+                eventProperties = {};
+            }
+    
+            eventProperties.WebSite = 'true';
+            eventProperties.IsAuthenticated = window.isAuthenticated;
+            eventProperties.country_code = getCountryCode();
+            eventProperties.lang = window.currentLang || '';
+    
+            var fullPageUrl = window.location.pathname.split('?')[0];
+            eventProperties.full_page_url = fullPageUrl;
+            eventProperties.page_url = clearPageUrl(fullPageUrl);
+    
+            if (typeof callback_function === 'function') {
+                amplitude.getInstance().logEvent(eventName, eventProperties, callback_function);
+            } else {
+                amplitude.getInstance().logEvent(eventName, eventProperties);
+            }
+        }
+    
+        function identifyAmplitudeUser(userId, token) {
+            if (userId) {
+                amplitude.getInstance().setUserProperties({
+                    "Token": token,
+                    "UserId": userId
+                });
+            }
+    
+            var identify = new amplitude.Identify();
+            amplitude.getInstance().identify(identify);
+            if (userId) {
+                amplitude.getInstance().setUserId(userId);
+            }
+        }
+    
+        function getUtmParamsFromUrl() {
+            var hash = window.location.hash;
+            var url = new URL(window.location.href);
+            if (hash && hash.indexOf('utm_') >= 0) {
+                url = new URL(window.location.origin + window.location.pathname + hash.replace('#', '?'));
+            }
+    
+            if (!url.searchParams) {
+                return '';
+            }
+            return getUtmParams(url);
+        }
+    
+        function hasGoogleIdFromUrl() {
+            var url = new URL(window.location.href);
+            if (!url.searchParams) {
+                return false;
+            }
+            return !!url.searchParams.get('gclid');
+        }
+    
+        function sendAnalyticsFromUrl(referrer, pageType) {
+            var urlIsAvailable = typeof URL === "function" || (navigator.userAgent.indexOf('MSIE') !== -1 && typeof URL === 'object');
+            if (!urlIsAvailable) {
+                return;
+            }
+    
+            var utmParams = getUtmParamsFromUrl();
+            if (!utmParams) {
+                return;
+            }
+    
+            var gclidFromUrl = utmParams.gclid;
+            var utmParamsFromUrl = !!utmParams.utmSource || !!utmParams.utmCampaign || !!utmParams.gclid;
+            if (!utmParamsFromUrl && userHasAdsParams)
+            {
+                utmParams = getUtmParamsFromCookie();
+            }
+    
+            var canLog = canLogToAmplitude(pageType);
+            if (utmParamsFromUrl || utmSourceFromReferrer) {
+                var fullPageUrl = window.location.pathname.split('?')[0];
+                var pageUrl = clearPageUrl(fullPageUrl);
+                var userProps = {
+                    "utm_source": utmParams.utmSource,
+                    "utm_campaign": utmParams.utmCampaign,
+                    "utm_content": utmParams.utmContent,
+                    "utm_group": utmParams.utmGroup,
+                    "utm_term": utmParams.utmTerm,
+                    "utm_page": getUtmPageValue(pageUrl),
+                    "utm_lang": window.currentLang || '',
+                    "referrer": referrer
+                };
+    
+                if (gclidFromUrl) {
+                    var landingUrl = pageUrl.startsWith('/') && pageUrl !== '/' ? pageUrl.substr(1) : pageUrl;
+                    userProps.landing_page = landingUrl;
+    
+                    var event = {
+                        'Page': landingUrl,
+                        'Url': window.location.href,
+                        'utm_campaign_event': utmParams.utmCampaign,
+                        'utm_group_event': utmParams.utmGroup
+    
+                    }
+                    sendAmplitudeAnalyticsData('Landing Page', event, userProps);
+                } else {
+                    var eventProps = {
+                        "utm_source": utmParams.utmSource,
+                        "utm_campaign": utmParams.utmCampaign,
+                        "utm_content": utmParams.utmContent,
+                        "utm_group": utmParams.utmGroup,
+                        "utm_term": utmParams.utmTerm
+                    };
+    
+                    if (utmParams.utmSource === "elastic") {
+                        sendAmplitudeAnalyticsData('Email Click', eventProps);
+                    }
+    
+                    if (canLog) {
+                        sendAmplitudeAnalyticsData('Campaign', eventProps, userProps);
+                    }
+                }
+            }
+    
+            if (logPageEvent && canLog || (pageType === 'Pricing Page' && window.isValidCountry(true))) {
+                var pageEventProps = {
+                    'type': pageType,
+                    'accepted_country': isValidCountry(),
+                    'force_log': !canLog
+                };
+    
+                if (utmParams.gclid) {
+                    pageEventProps.googleClickId = utmParams.gclid;
+                }
+    
+                sendAmplitudeAnalyticsData('Page View', pageEventProps);
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            if (location.href.indexOf('/frame/') === -1 && window.location.href.indexOf('skipCookie') === -1) {
+                PureCookie.initCookieConsent();
+            }
+            setCountryCode('https://location.nicepagesrv.com/country');
+            setUserIdCookie();
+    
+            var referrer = '';
+            var pageType = 'Template Page Preview';
+            sendAnalyticsFromUrl(referrer, pageType);
+        });
+    </script>
+
+<script>
+    // Define dataLayer and the gtag function.
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    var consentDefaultValue = 'granted';
+    gtag('consent', 'default', {
+        'ad_storage': consentDefaultValue,
+        'ad_user_data': consentDefaultValue,
+        'ad_personalization': consentDefaultValue,
+        'analytics_storage': consentDefaultValue
+    });
+    
+    if (hasGoogleIdFromUrl()) {
+        useExternalGtmCode = 1;
+    }
+</script>
+<!-- Google Tag Manager -->
+<script>
+    if (useExternalGtmCode) {
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://load.api9.nicepage.com/nldlswob.js?st='+i+dl+'';f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','W76XGFR');
+    } else {
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-W76XGFR');
+    }
+</script>
+<!-- End Google Tag Manager -->
+<!-- Facebook Pixel Code -->
+    <script>
+        if(window.hideFacebookPixelCode !== true) {
+            !function (f, b, e, v, n, t, s) {
+                if (f.fbq) return; n = f.fbq = function () {
+                    n.callMethod ?
+                        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                };
+                if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+                n.queue = []; t = b.createElement(e); t.async = !0;
+                t.src = v; s = b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t, s)
+            }(window, document, 'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+
+            var fbInitOptions = { em: '3e1af8d823ebd659f9545cd3e8e79f08aecc410d6f0a2e6e423244efc878819a' };
+            if (clientUserId > 0) {
+                fbInitOptions.external_id = clientUserId;
+            }
+
+            fbq('init', '251025992170426', fbInitOptions);
+            fbq('track', 'PageView');
+        }
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=251025992170426&ev=PageView&noscript=1" /></noscript>
+<!-- End Facebook Pixel Code -->
+
+<!-- Amplitude Code -->
+<script type="text/javascript">
+(function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script")
+        ;r.type="text/javascript"
+        ;r.integrity="sha384-d/yhnowERvm+7eCU79T/bYjOiMmq4F11ElWYLmt0ktvYEVgqLDazh4+gW9CKMpYW"
+        ;r.crossOrigin="anonymous";r.async=true
+        ;r.src="https://cdn.amplitude.com/libs/amplitude-5.2.2-min.gz.js"
+        ;r.onload=function(){if(!e.amplitude.runQueuedFunctions){
+            console.log("[Amplitude] Error: could not load SDK")}}
+        ;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)
+        ;function s(e,t){e.prototype[t]=function(){
+        this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+    var o=function(){this._q=[];return this}
+        ;var a=["add","append","clearAll","prepend","set","setOnce","unset"]
+        ;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[]
+            ;return this}
+        ;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"]
+        ;for(var p=0;p<l.length;p++){s(c,l[p])}n.Revenue=c
+        ;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","groupIdentify","onInit","logEventWithTimestamp","logEventWithGroups","setSessionId","resetSessionId"]
+        ;function v(e){function t(t){e[t]=function(){
+            e._q.push([t].concat(Array.prototype.slice.call(arguments,0)))}}
+        for(var n=0;n<d.length;n++){t(d[n])}}v(n);n.getInstance=function(e){
+            e=(!e||e.length===0?"$default_instance":e).toLowerCase()
+                ;if(!n._iq.hasOwnProperty(e)){n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]}
+        ;e.amplitude=n})(window,document);
+amplitude.getInstance().init("878f4709123a5451aff838c1f870b849");
+</script>
+
+<script>
+var shareasaleSSCID=shareasaleGetParameterByName("sscid");function shareasaleSetCookie(e,a,r,s,t){if(e&&a){var o,n=s?"; path="+s:"",i=t?"; domain="+t:"",S="";r&&((o=new Date).setTime(o.getTime()+r),S="; expires="+o.toUTCString()),document.cookie=e+"="+a+S+n+i+"; SameSite=None;Secure"}}function shareasaleGetParameterByName(e,a){a||(a=window.location.href),e=e.replace(/[\[\]]/g,"\\$&");var r=new RegExp("[?&]"+e+"(=([^&#]*)|&|#|$)").exec(a);return r?r[2]?decodeURIComponent(r[2].replace(/\+/g," ")):"":null}shareasaleSSCID&&shareasaleSetCookie("shareasaleSSCID",shareasaleSSCID,94670778e4,"/");
+</script>
+
+<script type="text/javascript">
+    var device = 'desktop';
+    function init($) {
+        $('#previewDesktopBtn').click(function (e) {
+            setLivePreviewFrameSize($(this));
+            setActiveResponsiveButton(this);
+            e.preventDefault();
+        });
+
+        $('#previewLaptopBtn').click(function (e) {
+            setLivePreviewFrameSize($(this));
+            setActiveResponsiveButton(this);
+            e.preventDefault();
+        });
+        $('#previewTabletBtn').click(function (e) {
+            setLivePreviewFrameSize($(this));
+            setActiveResponsiveButton(this);
+            e.preventDefault();
+        });
+        $('#previewPhoneHorizontalBtn').click(function (e) {
+            setLivePreviewFrameSize($(this));
+            setActiveResponsiveButton(this);
+            e.preventDefault();
+        });
+        $('#previewPhoneBtn').click(function (e) {
+            setLivePreviewFrameSize($(this));
+            setActiveResponsiveButton(this);
+            e.preventDefault();
+        });
+
+        detectActiveResponsiveButton();
+    }
+
+    if (jQuery.isReady) {
+        init(jQuery);
+    } else {
+        jQuery(function ($) {
+            init($);
+        });
+    }
+
+    function setActiveResponsiveButton(btn) {
+        $(".page-preview-header > a").removeClass("active");
+        $(btn).addClass("active");
+    }
+
+    function detectActiveResponsiveButton() {
+        var d = device;
+        if (!d) {
+            d = 'desktop';
+        }
+        $("#preview" + d.charAt(0).toUpperCase() + d.substr(1) + "Btn").click();
+    }
+
+    function getDataPreviewSizeAttr(el) {
+        return el.closest("[data-preview-size]").attr("data-preview-size");
+    }
+
+    function setLivePreviewFrameSize(srcEl) {
+        var getScrollbarWidth = function () {
+            var s = $('<div style="width:100px;height:100px;overflow:scroll;visibility:hidden;position:absolute;top:-99999px"><div style="height:200px;"></div></div>')
+                .appendTo("body");
+            var res = s.width() - s.find("div").last().width();
+            s.remove();
+            return res;
+        };
+        var attr = getDataPreviewSizeAttr(srcEl);
+        $('#livePreviewFrame').width(attr.indexOf("%") !== -1 ? attr : parseInt(attr, 10) + getScrollbarWidth());
+    }
+
+</script>
+<script type="text/javascript" async="" src="https://googleads.g.doubleclick.net/pagead/viewthroughconversion/797221335/?random=1737883533924&amp;cv=11&amp;fst=1737883533924&amp;bg=ffffff&amp;guid=ON&amp;async=1&amp;gtm=45be51n0v9101312129z879813278za200zb79813278&amp;gcd=13t3t3Z3t5l1&amp;dma=0&amp;tag_exp=102067555~102067808~102081485~102123608&amp;u_w=1680&amp;u_h=1050&amp;url=https%3A%2F%2Fnicepage.com%2Fwebsite-templates%2Fpreview%2Fexplore-wonderful-nature-12515%3Fdevice%3Ddesktop&amp;ref=https%3A%2F%2Fnicepage.com%2Fst%2F12515%2Fexplore-wonderful-nature-website-template&amp;hn=www.googleadservices.com&amp;frm=0&amp;tiba=Explore%20wonderful%20nature%20Website%20Template%20Live%20Demo&amp;npa=0&amp;pscdl=noapi&amp;auid=904467911.1737549632&amp;uaa=x86&amp;uab=64&amp;uafvl=Google%2520Chrome%3B131.0.6778.265%7CChromium%3B131.0.6778.265%7CNot_A%2520Brand%3B24.0.0.0&amp;uamb=0&amp;uam=&amp;uap=Windows&amp;uapv=10.0.0&amp;uaw=0&amp;fledge=1&amp;data=event%3Dgtag.config&amp;rfmt=3&amp;fmt=4"></script>
+
+
+    <header >
+        <nav>
+
+     <div class="navbar navbar-expand-md bg-light " style="margin-left: 5%;">
+
+
+            <img style="margin-right: 35%;" src="/images/website logo2.jpg" width="120px" alt="">
+
+    
+        <!-- Hamburger Button-->
+        <button  class="navbar-toggler mx-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon "></span>
+        </button>
+      
+        <!-- Navbar Menu -->
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+          <ul class="navbar-nav  ">
+    
+             <!-- 1st Dropdown -->
+            <li class="nav-item dropdown"><a class="nav-link all" href="Index.html"><button style="border: none;height: 40px;"><b>HOME</b></button></a></li>
+    
+            <!-- 2nd Dropdown -->
+            <li class="nav-item dropdown "><a class="nav-link all" data-bs-toggle="dropdown"><button style="border: none; height: 40px;"><b><b></b>ADVENTURES</b></button></a>
+              <ul class="dropdown-menu " aria-labelledby="navbarDropdown">
+                <li ><a class="dropdown-item" href="/pages/history.html">History</a></li>
+                <li ><a class="dropdown-item" href="/pages/types.html">Types / Style</a></li>
+                <li><a class="dropdown-item" href="/pages/sheltring.html">Sheltering</a></li>
+                <li><a class="dropdown-item" href="/pages/techniques.html">Techniques</a></li>
+                <li><a class="dropdown-item" href="/pages/hazards.html">Hazards</a></li>
+            </ul>
+            </li>
+    
+            <!-- 3rd Dropdown -->
+            <li class="nav-item dropdown "><a class="nav-link all" data-bs-toggle="dropdown"><button style="border: none; height: 40px;"><b>TRIP LEADERS</b></button></a>
+              <ul class="dropdown-menu " aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/pages/Trip Leadres.html">Trip Leaders</a></li>
+                <li><a class="dropdown-item" href="/pages/guidestaff.html">Guide Staff</a></li>
+                <li><a class="dropdown-item" href="/pages/login.html">Join Newslater</a></li>
+            </ul>
+            </li>
+    
+            <!-- 4th Dropdown -->
+            <li class="nav-item dropdown"><a class="nav-link all" href="/pages/About Us .html"><button style="border: none;height: 40px;"><b>ABOUT US</b></button></a></li>
+    
+            <li class="nav-item dropdown"><a class="nav-link all" href="/pages/contact.html"><button style="background-color: dodgerblue; color: white; border: none; width: 130%; height: 40px;"><b>CONTACT</b></button></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    </header>
+
+    <div>
+        <video style="width: 100%;" src="/images/lv_0_20250110223013.mp4" class="mb-5" autoplay muted loop></video>
+    </div>
+
+    <div class="container mt-5">
+        <div id="margin-left" class="row gy-3 my-3">
+    
+    
+    
+                <!-- FIRST CARD -->
+              <div class="col-sm-12 col-md-6 col-lg-4 mt-5">
+                <div class="card" style="border-radius: 10px; width: 300px;">
+                  <img src="/images/Dennis-Broadwell.jpg" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title text-center">Dennis Broadwell</h5>
+                    <p class="card-text text-center">Northwest</p>
+                    <a style="text-decoration: none;" href="/pages/dennis.html"><button class="button3">
+                      <svg class="svgIcon" viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path></svg>
+                     Meet The Guide
+                   </button></a>
+                  </div>
+                </div>
+              </div>
+    
+                <!-- SECOND CARD -->
+              <div class="col-sm-12 col-md-6 col-lg-4 mt-5">
+                <div class="card" style="border-radius: 10px; width: 300px;">
+                  <img src="/images/Stolte.jpg" style="height: 265px;" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title text-center">Avery Stolte</h5>
+                    <p class="card-text text-center">Northwest</p>
+                    <a style="text-decoration: none;" href="/pages/stolte.html"><button class="button3">
+                      <svg class="svgIcon" viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path></svg>
+                     Meet The Guide
+                   </button></a>
+                  </div>
+                </div>
+              </div>
+    
+                <!-- THIRD CONTAINER -->
+              <div class="col-sm-12 col-md-6 col-lg-4 mt-5">
+                <div class="card" style="border-radius: 10px; width: 300px;">
+                  <img src="/images/ty-sauerbrey.jpg" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title text-center">Ty Sauerbrey</h5>
+                    <p class="card-text text-center">International, Northwest</p>
+                    <a style="text-decoration: none;" href="/pages/tysauerbrey.html"><button class="button3">
+                      <svg class="svgIcon" viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path></svg>
+                     Meet The Guide
+                   </button></a>
+                  </div>
+                </div>
+              </div>
+
+            <!-- FIFTH CARD -->
+          <div class="col-sm-12 col-md-6 col-lg-4 mt-5">
+            <div class="card" style="border-radius: 10px; width: 300px;">
+              <img src="/images/ryan.webp" style="height: 265px;" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title text-center">Ryan Tellay</h5>
+                <p class="card-text text-center">Northwest</p>
+                <a style="text-decoration: none;" href="/pages/ryan.html"><button class="button3">
+                  <svg class="svgIcon" viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path></svg>
+                 Meet The Guide
+               </button></a>
+              </div>
+            </div>
+          </div>
+
+            <!-- SIXTH CONTAINER -->
+          <div class="col-sm-12 col-md-6 col-lg-4 mt-5">
+            <div class="card" style="border-radius: 10px; width: 300px;">
+              <img src="/images/adam.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title text-center">Adam Bronnes</h5>
+                <p class="card-text text-center">International, Northwest</p>
+                <a style="text-decoration: none;" href="/pages/adam.html"><button class="button3">
+                  <svg class="svgIcon" viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path></svg>
+                 Meet The Guide
+               </button></a>
+              </div>
+            </div>
+          </div>
+
+            <!-- SEVENTH CARD -->
+          <div class="col-sm-12 col-md-6 col-lg-4 mt-5">
+            <div class="card" style="border-radius: 10px; width: 300px;">
+              <img src="/images/Sam-Tyler.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title text-center">Sam-Tyler</h5>
+                <p class="card-text text-center">Northwest</p>
+                <a style="text-decoration: none;" href="/pages/sam.html"><button class="button3">
+                  <svg class="svgIcon" viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.9-15.1 18.4-18.4l144.3-55.5c19.4-7.5 38.5 11.6 31 31L325.1 306.7c-3.2 8.5-9.9 15.1-18.4 18.4zM288 256a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path></svg>
+                 Meet The Guide
+               </button></a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+    </div>
+    
+
+        
+
+
+        <div class="page-preview">
+            
+            <div class="page-preview-body">
+                <iframe id="livePreviewFrame" src="https://website12514.nicepage.io/Page-1.html?version=18405df5-5e2a-4c3d-a4eb-3350a1759503" width="1057" height="640" style="width:100%;"></iframe>
+            </div>
+        </div>
+
+
+
+        
+        
+                
+            
+        </body>
+
+
+<!-- Footer -->
+<footer class="bg-dark text-white pt-5 pb-4">
+    <div class="container text-center text-md-left">
+        <div style="justify-content: space-between;" class="row text-center text-md-left">
+            <div id="a" class="col-md-6 col-lg-4 col-xl-3 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-primary">Contact Us</h5>
+                <p>425-569-7098</p>
+                <p>Email Us <b>:</b>
+                info@mountain.com </p>
+                <p>Office Hours <b>:</b>
+                <br>Mon-Fri / 9am-6pm</p>
+                <p>#12,main office-Karachi</p>
+            </div>
+    
+            <div class="col-md-6 col-lg-4 col-xl-3 mx-auto">
+               <p><h5 class="text-uppercase mb-4 font-weight-bold text-primary">Mountain shop</h5>
+                <a href="contact.html"><img style="height: 100px; width: 150px; border-radius: 15px;" src="/images/mountain.png" alt=""></a></p>
+                
+                <p><h5 class="text-uppercase mb-4 font-weight-bold text-primary">Himali Shop</h5>
+                <a href="contact.html"><img style="height: 100px; border-radius: 10px;" src="/images/himali.jpg" alt=""></a></p>
+            </div>
+    
+            <div class="col-md-6 col-lg-4 col-xl-3 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-primary">Resources</h5>
+                <h5 class="text-primary"><a href=""></a>MOUNTAINS INFORMATION</h5>
+                        <p>
+                            <a href="/pages/history.html" class="text-white" style="text-decoration: none;">History</a>
+                        </p>
+                        <p>
+                            <a href="/pages/types.html" class="text-white" style="text-decoration: none;">Types / Style</a>
+                        </p>
+                        <p>
+                            <a href="/pages/sheltring.html" class="text-white" style="text-decoration: none;">Sheltering</a>
+                        </p>
+                        <p>
+                            <a href="/pages/hazards.html" class="text-white" style="text-decoration: none;">Hazards</a>
+                        </p>
+                        <p>
+                            <a href="/pages/techniques.html" class="text-white" style="text-decoration: none;">Techniques</a>
+                        </p>
+            </div>
+    
+            <div class="col-md-6 col-lg-4 col-xl-3 mx-auto">
+                <p><h5 class="text-uppercase mb-4 font-weight-bold text-primary">Partner</h5>
+                <img style="height: 150px; width: 150px; border-radius: 15px;" src="/images/logo.jpg" alt=""></p>
+    
+                <h5 class="text-uppercase mb-4 font-weight-bold text-primary">Book A trip</h5>
+                <p class="mt-4">
+                    <a href="contact.html" class="text-white" style="text-decoration: none;">Join Newsletter</a>
+                </p>
+                
+            </div>
+    
+        </div>
+    </div>
+    <br><br>
+
+    <div class="text-center">
+        <p>© 2025 Moutaineering Website. All Reserved Words</p>
+    </div>
+
+        <!-- SOCAIL LINKS --> 
+        <div id="abc">
+            <ul class="example-2">
+                <li class="icon-content">
+                  <a
+                    href="https://linkedin.com/"
+                    aria-label="LinkedIn"
+                    data-social="linkedin"
+                  >
+                    <div class="filled"></div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-linkedin"
+                      viewBox="0 0 16 16"
+                      xml:space="preserve"
+                    >
+                      <path
+                        d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </a>
+                  <div class="tooltip">LinkedIn</div>
+                </li>
+                <li class="icon-content">
+                  <a href="https://www.github.com/" aria-label="GitHub" data-social="github">
+                    <div class="filled"></div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-github"
+                      viewBox="0 0 16 16"
+                      xml:space="preserve"
+                    >
+                      <path
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </a>
+                  <div class="tooltip">GitHub</div>
+                </li>
+                <li class="icon-content">
+                  <a
+                    href="https://www.instagram.com/"
+                    aria-label="Instagram"
+                    data-social="instagram"
+                  >
+                    <div class="filled"></div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-instagram"
+                      viewBox="0 0 16 16"
+                      xml:space="preserve"
+                    >
+                      <path
+                        d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </a>
+                  <div class="tooltip">Instagram</div>
+                </li>
+                <li class="icon-content">
+                  <a href="https://youtube.com/" aria-label="Youtube" data-social="youtube">
+                    <div class="filled"></div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-youtube"
+                      viewBox="0 0 16 16"
+                      xml:space="preserve"
+                    >
+                      <path
+                        d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </a>
+                  <div class="tooltip">Youtube</div>
+                </li>
+              </ul>
+            </div>
+    </footer>
+    
+
+
+
+
+     <!-- Js cdn -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
